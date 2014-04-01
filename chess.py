@@ -174,9 +174,9 @@ class ChessMainWnd(tkinter.Frame):
 			p = 'K'
 		elif p == 'S':
 			p = 'R'
-		for each in s.gm.players[1].positions:
+		for each in s.gm.players[0].positions:
 			if each == pos:
-				# convert player 2 to lower case:
+				# convert player 1 to lower case:
 				p = p.lower()
 				break
 	
@@ -190,66 +190,66 @@ class ChessMainWnd(tkinter.Frame):
 			im = None
 		if p != '.':
 			alt_txt = p
-			if p == 'P' and b_images:
+			if p == 'p' and b_images:
 				if im == light:
 					im = lpawnd
 				else:
 					im = dpawnd
-			elif p == 'p' and b_images:
+			elif p == 'P' and b_images:
 				if im == light:
 					im = lpawn
 				else:
 					im = dpawn
-			elif p == 'B' and b_images:
+			elif p == 'b' and b_images:
 				if im == light:
 					im = lbishopd
 				else:
 					im = dbishopd
-			elif p == 'b' and b_images:
+			elif p == 'B' and b_images:
 				if im == light:
 					im = lbishop
 				else:
 					im = dbishop
-			elif p == 'R' or p == 'S':
-				alt_txt = "R"
+			elif p == 'r' or p == 's':
+				alt_txt = "r"
 				if im == light and b_images:
 					im = lrookd
 				elif b_images:
 					im = drookd
-			elif p == 'r' or p == 's':
-				alt_txt = "r"
+			elif p == 'R' or p == 'S':
+				alt_txt = "R"
 				if im == light and b_images:
 					im = lrook
 				elif b_images:
 					im = drook
-			elif p == 'N'  and b_images:
+			elif p == 'n'  and b_images:
 				if im == light:
 					im = lknightd
 				else:
 					im = dknightd
-			elif p == 'n' and b_images:
+			elif p == 'N' and b_images:
 				if im == light:
 					im = lknight
 				else:
 					im = dknight
-			elif p == 'K' or p == 'L':
-				alt_txt = "K"
+			elif p == 'k' or p == 'l':
+				alt_txt = "k"
 				if im == light and b_images:
 					im = lkingd
 				elif b_images:
 					im = dkingd
-			elif p == 'k' or p == 'l':
-				alt_txt = "k"
+			elif p == 'K' or p == 'L':
+				alt_txt = "K"
 				if im == light and b_images:
 					im = lking
 				elif b_images:
 					im = dking
-			elif p == 'Q' and b_images:
+			elif p == 'q' and b_images:
 				if im == light:
 					im = lqueend
 				else:
 					im = dqueend
-			elif p == 'q' and b_images:
+			elif p == 'Q' and b_images:
 				if im == light:
 					im = lqueen
 				else:
@@ -379,6 +379,7 @@ class ChessMainWnd(tkinter.Frame):
 				s.GUIboard[s.GUImoveend.row][s.GUImoveend.col]['image'] = None
 				s.GUIboard[s.GUImoveend.row][s.GUImoveend.col]['text'] = alt_txt					
 			s.display()
+			#if debug: s.gm.print_board()
 		except:
 			print("ChessMainWnd:display_move : Unexpected exception: ",sys.exc_info()[:2])
 		
@@ -430,7 +431,7 @@ class ChessMainWnd(tkinter.Frame):
 # GLOBALS -----------------------------------------------------------
 
 #debug control - set to False to remove debug messages
-debug = False
+debug = True
 GUI = True
 
 def trace(s):
@@ -758,14 +759,14 @@ class gameobject(object):
 			if iplayer == 0 and (start_pos.row == 1 and end_pos.row == 3 and start_pos.col == end_pos.col):
 				#valid - 2 moves forward, if unoccupied
 				if (not b_dest_empty) or s.cboard.grid[int((start_pos.row + end_pos.row)/2)][start_pos.col] != '.':
-					print("\nNot a valid move.\n")
+					if not GUI: print("\nNot a valid move.\n")
 					return False
 				else:
 					return not s.in_check(iplayer, dummyscore, start_pos, end_pos, None) # can't leave ourself in check
 			elif iplayer == 1 and start_pos.row == 6 and end_pos.row == 4 and start_pos.col == end_pos.col:
 				#valid -  2 moves forward, if unoccupied
 				if (not b_dest_empty) or s.cboard.grid[int((start_pos.row + end_pos.row)/2)][start_pos.col] != '.':
-					print("\nNot a valid move.\n")
+					if not GUI: print("\nNot a valid move.\n")
 					return False
 				else:
 					return not s.in_check(iplayer, dummyscore, start_pos, end_pos, None) # can't leave ourself in check
@@ -784,20 +785,20 @@ class gameobject(object):
 							if s.players[1-iplayer].pieces[i] == 'E':
 								return not s.in_check(iplayer, dummyscore, start_pos, end_pos, None) # can't leave ourself in check
 								# an en passant diagonal move
-					print("\nNot a valid move.\n")
+					if not GUI: print("\nNot a valid move.\n")
 					return False
 				elif end_pos.col == start_pos.col:
 					#valid -  1 move forward, if unoccupied
 					if not b_dest_empty:
-						print("\nNot a valid move.\n")
+						if not GUI: print("\nNot a valid move.\n")
 						return False
 					else:
 						return not s.in_check(iplayer, dummyscore, start_pos, end_pos, None) # can't leave ourself in check
 				else:
-					print("\nNot a valid move.\n")
+					if not GUI: print("\nNot a valid move.\n")
 					return False
 			else:
-				print("\nNot a valid move.\n")
+				if not GUI: print("\nNot a valid move.\n")
 				return False
 
 		# knight
@@ -1108,6 +1109,30 @@ class gameobject(object):
 		else:
 			return False
 		
+	def common_scoring(s, b_in_check, hiscore, check_direction, our_value, their_value, king_value, bAI, iplayer):
+		them_against_king,them_against_current,them_against_piece,us_against_king,us_against_piece,no_more = range(6)		
+	
+		try:
+			if check_direction == them_against_king:
+				b_in_check = True
+				hiscore -= 500
+			if check_direction == them_against_king or check_direction == them_against_piece:
+				hiscore -= our_value * (1 + (our_value >= 9))
+				# TO DO: if this is the only place our_value is used - we should instead just change the value of Q or K at source 
+			if check_direction == them_against_current:
+				hiscore += our_value * (1 + (our_value >= 9))
+			if check_direction == us_against_king:# or check_direction == us_against_piece
+				if s.get_num_pieces(iplayer) > 5:
+					hiscore -= int(king_value/1.4) # don't provide too much encouragement to check before it's going to work
+			if check_direction == us_against_piece:
+				hiscore += int(their_value / 1.5)	
+			#if not bAI:
+			#	return True
+		except:
+			print("Unexpected error in common_scoring: ",sys.exc_info()[:2])
+			
+		return bAI
+		
 	def in_check(s, player, hisc, start_pos, end_pos, gm):
 		# We have two options - either crunch every possible combination to stumble across checkch - 
 		# would be good when we need an AI function for the computers moves - or just calculate 
@@ -1115,7 +1140,7 @@ class gameobject(object):
 
 		# make a copy of the board and positions arrays, only modified so that any tentative move is overlaid.
 
-		# IF we are calling this to grade a move, follow this alogorithm:
+		# IF we are calling this to grade a move, follow this algorithm:
 		# Add points for the value of anything we've directly taken in this move
 		# Then two loops:
 		# 1. their moves against us - check, and against our moved piece
@@ -1124,734 +1149,667 @@ class gameobject(object):
 		#trace("in in_check: start_pos == " + str(start_pos) + " end_pos == " + str(end_pos) + "-----------------")
 		
 		# simulating pass by reference for the score, because ints are immutable (wrapping it in an 1-element list]
-		hiscore = hisc[0] # award 10 pts for a move that takes king - test check
-		
-		iplayer = player # allows us to play about with the player without causing confusion outside
-		bAI = False # whether we are using this to grade a computer's move
-		if hiscore > 0:
-			bAI = True
-		b_in_check = False
-		
-		if (gm is None):
-			pm = copy.deepcopy(s)# doesn't seem to do a deep copy at all - no improvement
-			pm.players = copy.deepcopy(s.players) # OK now
-			pm.cboard = copy.deepcopy(s.cboard)
-			# grid can't be deep copied this way
-			pm.cboard.grid = []
+		try:
+			hiscore = hisc[0] # award 10 pts for a move that takes king - test check
 			
-			for y in range(len(s.cboard.grid)):
-				for x in range(len(s.cboard.grid)):
-					row = []
-					row.append(s.cboard.grid[y][x])	
-				pm.cboard.grid.append(row)
-				# Note: Doesn't copy. The players array has this information though.
+			iplayer = player # allows us to play about with the player without causing confusion outside
+			bAI = False # whether we are using this to grade a computer's move
+			if hiscore > 0:
+				bAI = True
+			b_in_check = False
 			
-			#assert(id(pm.cboard.grid[1][0]) != id(s.cboard.grid[1][0]) ) # TO DO: restore when we can get the copy to work
-			assert(id(pm.players[1]) != id(s.players[1]) )
-			assert(id(pm.players[1].positions[0]) != id(s.players[1].positions[0]) )
-			# if either of these assert, then either the board, players or positions
-			# are not being copied properly
-			
-			pm.players = copy.deepcopy(s.players)
-			pm.cboard.grid = copy.deepcopy(s.cboard.grid)
-		else:
-			pm = gameobject(gm)
-			
-		# i.e. either construct a copy of the actual game, or a simulated game passed in.
-
-		# not a real enumeration, but as good as one:
-		# these cannot be enumerated over several lines, for some reason.
-		them_against_king,them_against_current,them_against_piece,us_against_king,us_against_piece,no_more = range(6)		
-		# 0 them_against_king							 					M:1 \
-		# 1 them_against_current - the opportunity cost (of not moving)	M:1 \
-		# 2 them_against_piece, - against the piece we've just moved		M:1 \
-		# 3 us_against_king, - check										M:1 \
-		# 4 us_against_piece, - against other pieces 						1:M \
-		# 5 no_more
-
-		nullpos = position() # for comparison
-					
-		if start_pos != nullpos:
-			# add scores for takeovers
-			our_value = s.get_capture_value(pm.cboard.grid[start_pos.row][start_pos.col])
-			their_value = s.get_capture_value(pm.cboard.grid[end_pos.row][end_pos.col])
-			king_value = s.get_capture_value('K')
-			
-			hiscore += their_value * 2 #pieces taken immediately have to be more valuable than those could be taken in the net turn...
-			# add the proposed move to the copy of the board
-			
-			pm.cboard.grid[end_pos.row][end_pos.col] = pm.cboard.grid[start_pos.row][start_pos.col]
-			pm.cboard.grid[start_pos.row][start_pos.col] = '.'
-								
-			for p_ind in range(len(pm.players[iplayer].positions)):
-				if pm.players[iplayer].positions[p_ind] == start_pos:
-					new_pos = position()
-					new_pos.row = end_pos.row
-					new_pos.col = end_pos.col
-					pm.players[iplayer].positions[p_ind] = new_pos
-					# At the moment this still just references end_pos (see note above),
-					# meaning the array reverts back without our knowledge or permission.
-					# So instead, I'm using a little code further down to compensate.
-					break		
-		else:
-			end_pos = pm.players[iplayer].positions[12] # for when we call it to check check AFTER a move
-			# required by the en passant code to show our king isn't a pawn
-			assert end_pos.col in range(8)
-			our_value = their_value = 0
-		
-		# also need to remove a captured piece, if there is one.
-		for each_pos in pm.players[1-iplayer].positions:
-			if each_pos == end_pos:
-				each_pos = position()
-	
-		# from this point on in the function, always use pm. syntax in front of members and function...
-
-		check_direction = them_against_king
-
-		while check_direction != no_more:
-			# go through all pieces, and all their moves - if any can move on the king, return True
-			# for each piece:
-			if bAI == False or (check_direction == them_against_king):
-				target_pos = pm.players[iplayer].positions[12]		
-				#if bAI == True: # TO DO: comment this line back in, as soon as we work out how to fix
-								# the assignment of our piece to its new position in the array ,earlier on
-					# if the piece we're proposing moving is the king, then we don't want to check against where the king WAS, but rather where the king WILL BE.
-				if pm.cboard.grid[end_pos.row][end_pos.col] == 'K' or pm.cboard.grid[end_pos.row][end_pos.col] == 'L':
-					target_pos = end_pos
-			elif check_direction == them_against_current:
-				target_pos = start_pos
-			elif check_direction == them_against_piece:
-				target_pos = end_pos 
-			elif check_direction == us_against_king:
-				target_pos = pm.players[iplayer].positions[12] # (iplayer has been reversed at this point)
-			elif check_direction == us_against_piece:
-				target_pos = end_pos
-
-			op_dir = iplayer * 2 -1
-			index = 0
-			bestoption = -1
-						
-			for index in range(len(pm.players[1-iplayer].positions)):
-				tpiece = pm.players[1-iplayer].pieces[index]
-			
-				op_pos = pm.players[1-iplayer].positions[index]
-				if check_direction == them_against_current:
-					op_pos = s.players[1-iplayer].positions[index]
-					# use existing grid, in case the move assumes the oppo piece is taken 
-				if not op_pos.is_valid():
-					continue
-				if check_direction == us_against_piece:
-					# in this context op_pos represents our piece, and target_pos is the opponent's
-					target_pos = op_pos
-					op_pos = end_pos
-					their_value = s.get_capture_value(pm.cboard.grid[target_pos.row][target_pos.col])
-					tpiece = pm.cboard.grid[end_pos.row][end_pos.col]
+			if (gm is None):
+				pm = copy.deepcopy(s)# doesn't seem to do a deep copy at all - no improvement
+				pm.players = copy.deepcopy(s.players) # OK now
+				pm.cboard = copy.deepcopy(s.cboard)
+				# grid can't be deep copied this way
+				pm.cboard.grid = []
 				
-				# pawns
-				if tpiece == 'P' or tpiece == 'E':
-					# for all moves, capturing or not:
-					if check_direction == them_against_piece and ((target_pos.row == 0 and iplayer == 1) or (target_pos.row == 7 and iplayer == 0)):
-						# if this will be a promotion move, the penalty should be the value of the queen
-						our_value = s.get_capture_value('Q')
-					if target_pos == op_pos and (check_direction == us_against_piece):
-						# no points for taking a piece we've already taken
-						pass
-					elif end_pos == op_pos and (check_direction == them_against_king or check_direction == them_against_piece):
-						pass
-						# This piece would already have been taken, therefore it can't threaten our pieces.
-					# diagonal move creates check
-					else:
-						if (op_pos.row + op_dir == target_pos.row) and ( abs(op_pos.col - target_pos.col) == 1 ) :
-							if check_direction == them_against_king:
-								b_in_check = True
-								hiscore -= 500
-							if check_direction == them_against_king or check_direction == them_against_piece:
-								hiscore -= our_value
-							if check_direction == them_against_current:
-								hiscore += our_value
-							if check_direction == us_against_king:# or check_direction == us_against_piece
-								if pm.get_num_pieces(iplayer) > 5:
-									hiscore -= int(king_value/1.4) # don't provide too much encouragement to check before it's going to work
-							if check_direction == us_against_piece:
-								hiscore += int(their_value / 1.5)
-							if bAI == False:
-								return True
-								
-						# en passant move creates check
-						if  (tpiece == 'E') and \
-							(op_pos.row == target_pos.row) and \
-							 abs(op_pos.col - target_pos.col) == 1 :
-							if check_direction == them_against_king:
-								b_in_check = True
-								hiscore -= 500 
-							if check_direction == them_against_king or check_direction == them_against_piece:
-								hiscore -= our_value
-							elif check_direction == them_against_current:
-								hiscore += our_value
-							elif check_direction == us_against_king: # or check_direction == us_against_piece
-								if pm.get_num_pieces(iplayer) > 5:
-									hiscore -= int(king_value/1.4) # don't provide too much encouragement to check before it's going to work
-							elif check_direction == us_against_piece:
-								hiscore += int(their_value / 1.5)
-							if not bAI:
-								return True
-					
-				# knight
-				if tpiece == 'N':
-					if target_pos == op_pos and (check_direction == us_against_piece):
-						# no points for taking a piece we've already taken
-						pass
-					elif end_pos == op_pos and (check_direction == them_against_king or check_direction == them_against_piece):
-						pass
-					elif (abs(op_pos.row - target_pos.row) == 1 and abs(op_pos.col - target_pos.col) == 2)  or \
-						(abs(op_pos.col - target_pos.col) == 1 and abs(op_pos.row - target_pos.row) == 2) :
-						if check_direction == them_against_king:
-							b_in_check = True
-							hiscore -= 500 
-						if check_direction == them_against_king or check_direction == them_against_piece:
-							hiscore -= our_value
-						if check_direction == them_against_current:
-							hiscore += our_value
-						if check_direction == us_against_king: # or check_direction == us_against_piece
-							if pm.get_num_pieces(iplayer) > 5:
-								hiscore -= int(king_value/1.4) # don't provide too much encouragement to check before it's going to work
-						if check_direction == us_against_piece:
-							hiscore += int(their_value / 1.5)
-						if not bAI:
-							return True
-					
-				# rook
-				if tpiece == 'R' or tpiece == 'S':
-					if target_pos == op_pos and (check_direction == us_against_piece):
-						# no points for taking a piece we've already taken
-						pass
-					elif end_pos == op_pos and (check_direction == them_against_king or check_direction == them_against_piece):
-						pass
-					elif op_pos.col == target_pos.col or op_pos.row == target_pos.row: # can't both be equal anyway
-						if op_pos == target_pos:
-							continue
-						# direction is OK, at least. Now check what's in the way...
-						distance = max( abs(op_pos.col - target_pos.col), abs(op_pos.row - target_pos.row))
-						if  pm.check_path(op_pos, target_pos, distance, False, True, iplayer, False) : # returns True if the target can be captured
-							if check_direction == them_against_king:
-								b_in_check = True
-								hiscore -= 500
-							if check_direction == them_against_king or check_direction == them_against_piece:
-								hiscore -= our_value
-							if check_direction == them_against_current:
-								hiscore += our_value
-							if check_direction == us_against_king: #  or check_direction == us_against_piece
-								if pm.get_num_pieces(iplayer) > 5:
-									hiscore -= int(king_value/1.4) # don't provide too much encouragement to check before it's going to work
-							if check_direction == us_against_piece:
-								hiscore += int(their_value / 1.5)
-							if not bAI:
-								return True
-						
-					# not assuming check:
-					if check_direction == us_against_king:
-						trace("o_p=" + str(op_pos) + " t_p=" + str(target_pos))
-						if  (abs((op_pos.col - target_pos.col)) == 2 and \
-							abs((op_pos.row - target_pos.row)) == 1) or \
-							(abs((op_pos.col - target_pos.col)) == 2 and \
-							abs((op_pos.row - target_pos.row)) == 1):
-							hiscore += 2 # small incentive for a move close enough to cut the king's moves, even if it's not check
-							trace("bonus for getting rook near to king")
+				for y in range(len(s.cboard.grid)):
+					for x in range(len(s.cboard.grid)):
+						row = []
+						row.append(s.cboard.grid[y][x])	
+					pm.cboard.grid.append(row)
+					# Note: Doesn't copy. The players array has this information though.
 				
-				# bishop
-				if tpiece == 'B':
-					if target_pos == op_pos and (check_direction == us_against_piece):
-						# no points for taking a piece we've already taken
-						pass
-					elif end_pos == op_pos and (check_direction == them_against_king or check_direction == them_against_piece):
-						pass
-					else:	
-						if  abs(op_pos.col - target_pos.col) == abs(op_pos.row - target_pos.row) : # horizontal distance = vertical
-							# direction is OK, at least. Now check what's in the way...
-							distance = abs(op_pos.col - target_pos.col)
-							if  pm.check_path(op_pos, target_pos, distance, False, True, iplayer, False) :
-								if check_direction == them_against_king:
-									b_in_check = True
-									hiscore -= 500
-								if check_direction == them_against_king or check_direction == them_against_piece:
-									hiscore -= our_value
-								if check_direction == them_against_current:
-									hiscore += our_value
-								if check_direction == us_against_king: # or check_direction == us_against_piece
-									if pm.get_num_pieces(iplayer) > 5:
-										hiscore -= int(king_value/1.4) # don't provide too much encouragement to check before it's going to work
-								if check_direction == us_against_piece:
-									hiscore += int(their_value / 1.5)
-								if not bAI:
-									return True
-								
-					# not assuming check:
-					if check_direction == us_against_king:
-						if  abs(op_pos.col - target_pos.col) == 2 and \
-							 abs(op_pos.row - target_pos.row) == 2 :
-							hiscore += 3 # incentive for a move close enough to cut the king's moves
-						
-				# queen or king
-				if tpiece == 'K' or tpiece == 'L' or tpiece == 'Q':
-					if target_pos == op_pos and (check_direction == us_against_piece):
-						# no points for taking a piece we've already taken
-						pass
-					elif end_pos == op_pos and (check_direction == them_against_king or check_direction == them_against_piece):
-						pass
-					else:
-						if  abs(op_pos.col - target_pos.col) == abs(op_pos.row - target_pos.row) or \
-							(op_pos.col == target_pos.col or op_pos.row == target_pos.row) :
-							# direction is OK, at least. Now check what's in the way...
-							if op_pos == target_pos:
-								# something's wrong then - how can they match?
-								trace("\tERROR: op_pos == target_pos : " + str(op_pos))
-								continue
-							distance = max(  abs(op_pos.col - target_pos.col) ,	\
-								max(abs(op_pos.col - target_pos.col), abs(op_pos.row - target_pos.row)) )	# if h/v
-							if distance == 1 or tpiece == 'Q': # Kings can only move one space
-								if  pm.check_path(op_pos, target_pos, distance, False, True, iplayer, False) :
-									if check_direction == them_against_king:
-										b_in_check = True
-										hiscore -= 500
-									if check_direction == them_against_king or check_direction == them_against_piece:
-										hiscore -= our_value * 2 # build in a defensive bias to stop the queen being risked
-									if check_direction == them_against_current:
-										hiscore += our_value * 2
-									if check_direction == us_against_king: # or check_direction == us_against_piece
-										if pm.get_num_pieces(iplayer) > 5:
-											hiscore -= int(king_value/1.4) # don't provide too much encouragement to check before it's going to work
-									if check_direction == us_against_piece:
-										hiscore += int(their_value / 1.5)
-									if not bAI:
-										return True
-								
-					# not assuming check:
-					if check_direction == us_against_king:
-						if  abs(op_pos.col - target_pos.col) == 2 or \
-							abs(op_pos.row - target_pos.row) == 2 :
-							hiscore += 2 # incentive for a move close enough to cut the king's moves
-		
-			if bAI == True:
-				if check_direction == them_against_king:
-					check_direction = them_against_current
-					trace("entered them_against_current state, player = " + str(iplayer))
-				elif check_direction == them_against_current:
-					check_direction = them_against_piece
-					trace("entered them_against_piece state, player = " + str(iplayer))
-				elif check_direction == them_against_piece:
-					iplayer = 1-iplayer
-					check_direction = us_against_king
-					trace("entered us_against_king state, player = " + str(iplayer))
-				elif check_direction == us_against_king:
-					iplayer = 1-iplayer
-					check_direction = us_against_piece
-					trace("entered us_against_piece state, player = " + str(iplayer))
-				elif check_direction == us_against_piece:
-					check_direction = no_more
+				#assert(id(pm.cboard.grid[1][0]) != id(s.cboard.grid[1][0]) ) # TO DO: restore when we can get the copy to work
+				assert(id(pm.players[1]) != id(s.players[1]) )
+				assert(id(pm.players[1].positions[0]) != id(s.players[1].positions[0]) )
+				# if either of these assert, then either the board, players or positions
+				# are not being copied properly
+				
+				pm.players = copy.deepcopy(s.players)
+				pm.cboard.grid = copy.deepcopy(s.cboard.grid)
 			else:
-				check_direction = no_more
-		
-		# penalise the move if we moved the same piece in the previous turn
-		if bAI:
-			if s.players[iplayer].pieces[s.players[iplayer].last_piece_moved] == pm.cboard.grid[start_pos.row][start_pos.col]:
-				hiscore -=3
-				if pm.cboard.grid[start_pos.row][start_pos.col] == 'Q' and s.get_num_pieces(1-iplayer) < 4:
-					# penalise the move if we moved the same queen in the previous turn (in addition to the general penalty below)
-					# this will give other pieces the chance to move in for the kill in the end game
-					hiscore -= 5
-			
-		finalhiscore = hiscore
-		trace("finalhiscore = " + str(finalhiscore))
-		hisc[0] = finalhiscore
-		if not bAI:
-			return False
-		else:
-			return b_in_check
-		
-	def in_check_mate(s, iplayer, b_move):		
-		# player here represents the next player, after the last move. We want to know if our player has any possible move.
-		# loop through every piece.
-		our_dir = 1 - iplayer * 2
-		index = 0
-		hiscore = 0
-		movescore = 1000
-
-		# to evaluate in random order...
-		
-		from random import shuffle
-		my_indexes = [y for y in range(len(s.players[iplayer].positions))]
-		shuffle(my_indexes)
-		#my_indexes = [8,3,12,13,9,11,2,6,5,7,0,1,15,4,10,14]
-		# but use a fixed array like above if we want to test this version against the C++ version
-	
-		op_king_pos = position(s.players[1-iplayer].positions[0])
-		num_our_pieces = s.get_num_pieces(iplayer)
-		num_their_pieces = s.get_num_pieces(1-iplayer)
-
-		for ind in range (len(s.players[iplayer].positions)):
-			# translate from index array - this should make it consider moves from all the same pieces, in a random order
-			i = my_indexes[ind]
-		
-			our_pos = s.players[iplayer].positions[i]
-			if not our_pos.is_valid():
-				continue # this piece was taken already
-			end_pos = position()
-		
-			# pawns
-			# diagonal move creates check
-			p = s.players[iplayer].pieces[i]
-			if p == 'P' or p == 'E':
-				trace("\ta pawn")
-				# one forward
-				end_pos.row = our_pos.row + our_dir
-				end_pos.col = our_pos.col
-				if  (not s.is_ours(end_pos, iplayer)) and (not s.is_ours(end_pos, 1-iplayer)) :
-					movescore = [1]
-					movescore[0] = 1002
-					if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
-						# this would get us out of check - we can leave now
-						if b_move:
-							if (our_pos.col > 0 and our_pos.col < 7):
-								if s.cboard.grid[iplayer * 7][our_pos.col - 1] == 'B' or s.cboard.grid[iplayer * 7][our_pos.col + 1] == 'B':
-									# frees a bishop
-									movescore[0] += 2
-							if to_endline(our_pos,end_pos, 1, iplayer):
-								movescore[0] += 4
-							if hiscore < movescore[0]:
-								hiscore = movescore[0]
-								s_move = s.create_move(our_pos, end_pos)
-						else:
-							return False
-				# two forward
-				if (our_pos.row == 1 and our_dir == 1) or (our_pos.row == 7 and our_dir == -1):
-					end_pos.row = int(our_pos.row + our_dir * 2)
-					end_pos.col = int(our_pos.col)
-					if not s.is_ours(end_pos, iplayer):
-						if s.cboard.grid[end_pos.row][end_pos.col] == '.' and s.cboard.grid[int((our_pos.row + end_pos.row)/2)][int(our_pos.col)] == '.':
-							movescore = [1]
-							movescore[0] = 1003
-							if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
-								if b_move:
-									if our_pos.col > 0 and our_pos.col < 7:
-										if s.cboard.grid[iplayer * 7][our_pos.col - 1] == 'B' or s.cboard.grid[iplayer * 7][our_pos.col + 1] == 'B':
-											# frees a bishop
-											movescore[0] += 2
-									if hiscore < movescore[0]:
-										hiscore = movescore[0]
-										s_move = s.create_move(our_pos, end_pos)
-								else:
-									return False
-				# diagonals, taking a piece
-				# try left, then right:
-				for ep_dir in range(-1,2,2):
-					if (our_pos.col + ep_dir) in range(8):
-						end_pos.row = our_pos.row + our_dir
-						end_pos.col = our_pos.col + ep_dir
-						ep_pos = position(our_pos.row, end_pos.col)
-						if  s.is_ours(end_pos, 1-iplayer) and not(s.is_ours(ep_pos, 1-iplayer) and s.cboard.grid[our_pos.row][end_pos.col] == 'E') :
-							# if we call is_ours with the other player, it's effectively an "is_theirs" function
-							# this comparison also makes sure we don't steal the en passant case below
-							movescore = [1]
-							movescore[0] = 1002
-							if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
-								if b_move:
-									if to_endline(our_pos,end_pos, 1, iplayer):
-										movescore[0] += 4
-									if hiscore < movescore[0]:
-										hiscore = movescore[0]
-										s_move = s.create_move(our_pos, end_pos)
-								else:
-									return False
-							else:
-								pass
-				# en passant - possibly still taking a piece
-				# diagonals, taking a piece
-				# try left, then right:
-				for ep_dir in range(-1,2,2):
-					if (our_pos.col + ep_dir) in range(8):
-						end_pos.row = our_pos.row + our_dir
-						end_pos.col = our_pos.col + ep_dir
-						ep_pos = position(our_pos.row, end_pos.col)
-						if ep_pos.is_valid() and not s.is_ours(end_pos, iplayer):
-							# here it gets difficult. It isn't enough to pass in the normal diagonal move,
-							# because the pawn we take en passant may also affect check. So we will
-							# create a temporary modified board for this single circumstance and 
-							# pass a reference to it to check in, AND the diagonal move.
-							if s.is_ours(ep_pos, 1-iplayer) and s.cboard.grid[our_pos.row][end_pos.col] == 'E':
-								gm = gameobject(s) # proposed move
-								# now replace the captured en passant pawn
-								gm.cboard.grid[our_pos.row][end_pos.col] = '.'
-								for index in range(len(gm.players[1-iplayer].positions)):
-									if gm.players[1-iplayer].positions[index] == ep_pos:
-										gm.players[1-iplayer].positions[index] = position()
-
-								# if it turns out the position we move the pawn into also contains an opposing piece, this will be handled explicity in in_check.
-								movescore = [1]
-								movescore[0] = 1004
-								if not s.in_check(iplayer, movescore, our_pos, end_pos, gm): 
-									if b_move:
-										if hiscore < movescore[0]:
-											hiscore = movescore[0]
-											s_move = s.create_move(our_pos, end_pos)
-									else:
-										return False
-				# finally, promotion doesn't matter for determining check-mate, as a piece of any type can't move until the next go anyway
-			elif p == 'N':
-				trace("\ta knight")
-				# knight
-				# the eight combinations:
-				for y in range(-2,3,1):
-					for x in range(-2,3,1):
-						if x == 0 or y == 0:
-							continue
-						end_pos.row = our_pos.row
-						end_pos.col = our_pos.col
-						if abs(x) != abs(y):
-							end_pos.row = end_pos.row + y
-							end_pos.col = end_pos.col + x
-							if not end_pos.is_valid():
-								continue # out of bounds try next combo
-							if not s.is_ours(end_pos, iplayer):
-								movescore = [1]
-								movescore[0] = 1001
-								if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
-									if b_move:
-										pmv = pastmove(our_pos, end_pos)					
-										if s.players[iplayer].piecemoves[i].pastmove_set[tuple(pmv)] > 0:
-											pm2 = tuple(pmv)
-										for l in s.players[iplayer].piecemoves[i].pastmove_set.elements():
-											s1, s2, s3, s4 = l# s.players[iplayer].piecemoves[i].pastmove_set[l]
-											if our_pos.row == s1 and our_pos.col == s2 and end_pos.row == s3 and end_pos.col == s4:
-												movescore[0] -= s.players[iplayer].piecemoves[i].pastmove_set[l] * 3 # i.e. penalise repeat moves
-												break
-										if off_backline(our_pos,end_pos, 2, iplayer):
-											movescore[0] += 2
-										if hiscore < movescore[0]:
-											hiscore = movescore[0]
-											s_move = s.create_move(our_pos, end_pos)
-									else:
-										return False
-			elif p == 'R' or p == 'S':
-				trace("\ta rook")
-				dx = 0
-				dy = 0
-				for dir in range(4):
-					if dir == 0:
-						dx = -1
-						dy = 0
-					elif dir == 1:
-						dx = 1
-						dy = 0
-					elif dir == 2:
-						dx = 0
-						dy = -1
-					elif dir == 3:
-						dy = 0
-						dy = 1
-					#end_pos = our_pos # this isn't working#
-					end_pos = position(our_pos.row, our_pos.col)
-					offset = 1
-					b_cont = True
-					while b_cont:
-						end_pos.row = end_pos.row + dy
-						end_pos.col = end_pos.col + dx
-						# in bounds?
-						if not end_pos.is_valid():
-							b_cont = False
-						else:
-							if not s.is_ours(end_pos, iplayer): # possible
-								movescore = [1]
-								movescore[0] = 1001
-								if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
-									if b_move:
-										pmv = pastmove(our_pos, end_pos)					
-										if s.players[iplayer].piecemoves[i].pastmove_set[tuple(pmv)] > 0:
-											pm2 = tuple(pmv)
-										for l in s.players[iplayer].piecemoves[i].pastmove_set.elements():
-											s1, s2, s3, s4 = l# s.players[iplayer].piecemoves[i].pastmove_set[l]
-											if our_pos.row == s1 and our_pos.col == s2 and end_pos.row == s3 and end_pos.col == s4:
-												movescore[0] -= s.players[iplayer].piecemoves[i].pastmove_set[l] * 3 # i.e. penalise repeat moves
-												break
-										if hiscore < movescore[0]:
-											hiscore = movescore[0]
-											s_move = s.create_move(our_pos, end_pos)
-									else:
-										return False
-								if s.is_ours(end_pos, 1-iplayer): # theirs - we can't go on then
-									b_cont = False
-							else:
-								b_cont = False
-			elif p == 'B':
-				trace("\ta bishop")
-				# bishop
-				dx = -1
-				dy = -1
-				for dir in range(4):
-					if dir == 0: # SE
-						dx = dy = 1
-					elif dir == 1: # NE
-						dx = 1
-						dy = -1
-					elif dir == 2: # SW
-						dx = -1
-						dy = 1
-					elif dir == 3: # NW
-						dx = dy = -1
-
-					# this algorithm is IDENTICAL to the rook
-					end_pos = position(our_pos.row, our_pos.col)
-					offset = 1
-					b_cont = True
-					while b_cont:
-						end_pos.row = end_pos.row + dy
-						end_pos.col = end_pos.col + dx
-						# in bounds?
-						if not end_pos.is_valid():
-							b_cont = False
-						else:
-							if not s.is_ours(end_pos, iplayer): # possible
-								movescore = [1]
-								movescore[0] = 1001
-								if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
-									if b_move:
-										pmv = pastmove(our_pos, end_pos)					
-										if s.players[iplayer].piecemoves[i].pastmove_set[tuple(pmv)] > 0:
-											pm2 = tuple(pmv)
-										for l in s.players[iplayer].piecemoves[i].pastmove_set.elements():
-											s1, s2, s3, s4 = l
-											if our_pos.row == s1 and our_pos.col == s2 and end_pos.row == s3 and end_pos.col == s4:
-												movescore[0] -= s.players[iplayer].piecemoves[i].pastmove_set[l] * 3 # i.e. penalise repeat moves
-												break
-										if off_backline(our_pos,end_pos, 2, iplayer):
-											movescore[0] += 2
-										if hiscore < movescore[0]:
-											hiscore = movescore[0]
-											s_move = s.create_move(our_pos, end_pos)
-									else:
-										return False
-								if s.is_ours(end_pos, 1-iplayer): # theirs - we can't go on then
-									b_cont = False
-							else:
-								b_cont = False
-			if p == 'K' or p == 'L' or p == 'Q':
-				trace("\ta king or queen")
-				# queen or king
-				dx = dy = 0
-				for dir in range(8):
-					if dir == 0: # N
-						dx = 0
-						dy = -1
-					elif dir == 1: # NE
-						dx = 1
-						dy = -1
-					elif dir == 2: # E
-						dx = 1
-						dy = 0
-					elif dir == 3: # SE
-						dx = dy = 1
-					elif dir == 4: # S
-						dx = 0
-						dy = 1
-					elif dir == 5: # SW
-						dx = -1
-						dy = 1
-					elif dir == 6: # W
-						dx = -1
-						dy = 0
-					elif dir == 7: # NW
-						dx = dy = -1
-
-					# this algorithm is ALMOST IDENTICAL to the rook and bishop
-					end_pos = position(our_pos.row, our_pos.col)
-					b_cont = True
-					while b_cont:
-						end_pos.row = end_pos.row + dy
-						end_pos.col = end_pos.col + dx
-						# in bounds?
-						if not end_pos.is_valid():
-							b_cont = False
-						else:
-							if not s.is_ours(end_pos, iplayer): # possible
-								movescore = [1]
-								movescore[0] = 1001
-								if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
-									if b_move:
-										pmv = pastmove(our_pos, end_pos)					
-										if s.players[iplayer].piecemoves[i].pastmove_set[tuple(pmv)] > 0:
-											pm2 = tuple(pmv)
-										for l in s.players[iplayer].piecemoves[i].pastmove_set.elements():
-											s1, s2, s3, s4 = l
-											if our_pos.row == s1 and our_pos.col == s2 and end_pos.row == s3 and end_pos.col == s4:
-												movescore[0] -= s.players[iplayer].piecemoves[i].pastmove_set[l] * 3 # i.e. penalise repeat moves
-												break
-										if (num_our_pieces < num_their_pieces) and (num_our_pieces < 5) and (our_pos.row != (iplayer*7)) and (end_pos.row == (iplayer * 7)):
-											movescore[0] -= 2 # subtle hint not to move king into the far home corner in the later stages when under pressure
-										if hiscore < movescore[0]:
-											hiscore = movescore[0]
-											s_move = s.create_move(our_pos, end_pos)
-									else:
-										return False
-								if s.is_ours(end_pos, 1-iplayer): # theirs - we can't go on then
-									b_cont = False
-							else:
-								b_cont = False
-						if s.players[iplayer].pieces[i] == 'L' and dy == 0 and abs(end_pos.col - our_pos.col) == 2:
-							# castling - taken from validate_move
-
-							# Castling is permissible if and only if all of the following conditions hold:
-							# 1. The king and the chosen rook are on the player's first rank.
-							# 2. Neither the king nor the chosen rook have previously moved.
-							#    (Use L for an unmoved king, and S for an unmoved rook)
-							
-							rook_pos = position()
-							if s.cboard.grid[iplayer*7][0] == 'S' and s.cboard.grid[iplayer*7][4] == 'L' and our_pos.col == 4 and end_pos.col == 2:
-								rook_pos.col = 0
-							elif s.cboard.grid[iplayer*7][7] == 'S' and s.cboard.grid[iplayer*7][4] == 'L' and our_pos.col == 4 and end_pos.col == 6:
-								rook_pos.col = 7
-							else:
-								b_cont = False # one or both of the king and the rook have moved from their starting position (even if they've since returned
-							rook_pos.row = iplayer*7
-
-							theirpiece = s.is_ours(end_pos,1-iplayer) - 1 # technically this requires an actual index but for the moment, -1 means not theirs
-							b_dest_empty = (not s.is_ours(end_pos,1-iplayer)) and (not s.is_ours(end_pos,iplayer))
-						
-							# 3. There are no pieces between the king and the chosen rook (NOT merely where the king moves to.)			
-							if not s.check_path(our_pos, rook_pos, abs(end_pos.col - our_pos.col), b_dest_empty, theirpiece, iplayer,False):
-								b_cont = False
+				pm = gameobject(gm)
 				
-							# 4. The king is not currently in check.
-							movescore = [1]
-							movescore[0] = 0
-							if s.in_check(iplayer, movescore, position(), position(), None):
-								b_cont = False
+			# i.e. either construct a copy of the actual game, or a simulated game passed in.
 
-							# 5. The king does not pass through a square that is attacked by an enemy piece.
-							#    - Oh bloody hell. Modify check_path to call in_check for every square it passes through...
-							if not s.check_path(our_pos, end_pos, abs(end_pos.col - our_pos.col), b_dest_empty, theirpiece, iplayer, True):
-								b_cont = False
+			# not a real enumeration, but as good as one:
+			# these cannot be enumerated over several lines, for some reason.
+			them_against_king,them_against_current,them_against_piece,us_against_king,us_against_piece,no_more = range(6)		
+			# 0 them_against_king							 					M:1 \
+			# 1 them_against_current - the opportunity cost (of not moving)	M:1 \
+			# 2 them_against_piece, - against the piece we've just moved		M:1 \
+			# 3 us_against_king, - check										M:1 \
+			# 4 us_against_piece, - against other pieces 						1:M \
+			# 5 no_more
 
-							# 6. The king does not end up in check. (True of any legal move.)
-							# Rook manouevre is already proven as valid
-							movescore = [1]
-							movescore[0] = 1003
-							if not s.in_check(iplayer, movescore, our_pos, end_pos, None): #new king pos, NOT the rook pos...
-								if b_move:
-									pmv = pastmove(our_pos, end_pos)
-									movescore[0] -= s.players[iplayer].piecemoves[i].pastmove_set[tuple(pmv)] * 3 # i.e. penalise repeat moves
-									if hiscore < movescore[0]:
-										hiscore = movescore[0]
-										s_move = s.create_move(our_pos, end_pos)
-								else:
-									return False
+			nullpos = position() # for comparison
+			king_value = s.get_capture_value('K')
+						
+			if start_pos != nullpos:
+				# add scores for takeovers
+				our_value = s.get_capture_value(pm.cboard.grid[start_pos.row][start_pos.col])
+				their_value = s.get_capture_value(pm.cboard.grid[end_pos.row][end_pos.col])
+								
+				hiscore += their_value * 2 #pieces taken immediately have to be more valuable than those could be taken in the net turn...
+				# add the proposed move to the copy of the board
+				
+				pm.cboard.grid[end_pos.row][end_pos.col] = pm.cboard.grid[start_pos.row][start_pos.col]
+				pm.cboard.grid[start_pos.row][start_pos.col] = '.'
+									
+				for p_ind in range(len(pm.players[iplayer].positions)):
+					if pm.players[iplayer].positions[p_ind] == start_pos:
+						new_pos = position()
+						new_pos.row = end_pos.row
+						new_pos.col = end_pos.col
+						pm.players[iplayer].positions[p_ind] = new_pos
+						# At the moment this still just references end_pos (see note above),
+						# meaning the array reverts back without our knowledge or permission.
+						# So instead, I'm using a little code further down to compensate.
+						break		
+			else:
+				end_pos = pm.players[iplayer].positions[12] # for when we call it to check check AFTER a move
+				# required by the en passant code to show our king isn't a pawn
+				assert end_pos.col in range(8)
+				our_value = their_value = 0
+			
+			# also need to remove a captured piece, if there is one.
+			for each_pos in pm.players[1-iplayer].positions:
+				if each_pos == end_pos:
+					each_pos = position()
+		
+			# from this point on in the function, always use pm. syntax in front of members and function...
+
+			check_direction = them_against_king
+
+			while check_direction != no_more:
+				# go through all pieces, and all their moves - if any can move on the king, return True
+				# for each piece:
+				if bAI == False or (check_direction == them_against_king):
+					target_pos = pm.players[iplayer].positions[12]		
+					#if bAI == True: # TO DO: comment this line back in, as soon as we work out how to fix
+									# the assignment of our piece to its new position in the array ,earlier on
+						# if the piece we're proposing moving is the king, then we don't want to check against where the king WAS, but rather where the king WILL BE.
+					if pm.cboard.grid[end_pos.row][end_pos.col] == 'K' or pm.cboard.grid[end_pos.row][end_pos.col] == 'L':
+						target_pos = end_pos
+				elif check_direction == them_against_current:
+					target_pos = start_pos
+				elif check_direction == them_against_piece:
+					target_pos = end_pos 
+				elif check_direction == us_against_king:
+					target_pos = pm.players[iplayer].positions[12] # (iplayer has been reversed at this point)
+				elif check_direction == us_against_piece:
+					target_pos = end_pos
+
+				op_dir = iplayer * 2 -1
+				index = 0
+				bestoption = -1
+							
+				for index in range(len(pm.players[1-iplayer].positions)):
+					tpiece = pm.players[1-iplayer].pieces[index]
+				
+					op_pos = pm.players[1-iplayer].positions[index]
+					if check_direction == them_against_current:
+						op_pos = s.players[1-iplayer].positions[index]
+						# use existing grid, in case the move assumes the oppo piece is taken 
+					if not op_pos.is_valid():
+						continue
+					if check_direction == us_against_piece:
+						# in this context op_pos represents our piece, and target_pos is the opponent's
+						target_pos = op_pos
+						op_pos = end_pos
+						their_value = s.get_capture_value(pm.cboard.grid[target_pos.row][target_pos.col])
+						tpiece = pm.cboard.grid[end_pos.row][end_pos.col]
+					
+					# pawns
+					if tpiece == 'P' or tpiece == 'E':
+						# for all moves, capturing or not:
+						if check_direction == them_against_piece and ((target_pos.row == 0 and iplayer == 1) or (target_pos.row == 7 and iplayer == 0)):
+							# if this will be a promotion move, the penalty should be the value of the queen
+							our_value = s.get_capture_value('Q')
+						if target_pos == op_pos and (check_direction == us_against_piece):
+							# no points for taking a piece we've already taken
+							pass
+						elif end_pos == op_pos and (check_direction == them_against_king or check_direction == them_against_piece):
+							pass
+							# This piece would already have been taken, therefore it can't threaten our pieces.
+						# diagonal move creates check
+						else:
+							if (op_pos.row + op_dir == target_pos.row) and ( abs(op_pos.col - target_pos.col) == 1 ) :
+								if not s.common_scoring(b_in_check, hiscore, check_direction, our_value, their_value, king_value, bAI, iplayer):
+									return True
+									
+							# en passant move creates check
+							if  (tpiece == 'E') and \
+								(op_pos.row == target_pos.row) and \
+								abs(op_pos.col - target_pos.col) == 1 :
+								if not s.common_scoring(s, b_in_check, hiscore, check_direction, our_value, their_value, king_value, bAI, iplayer):
+									return True
+						
+					# knight
+					if tpiece == 'N':
+						if target_pos == op_pos and (check_direction == us_against_piece):
+							# no points for taking a piece we've already taken
+							pass
+						elif end_pos == op_pos and (check_direction == them_against_king or check_direction == them_against_piece):
+							pass
+						elif (abs(op_pos.row - target_pos.row) == 1 and abs(op_pos.col - target_pos.col) == 2)  or \
+							(abs(op_pos.col - target_pos.col) == 1 and abs(op_pos.row - target_pos.row) == 2) :
+							if not s.common_scoring(b_in_check, hiscore, check_direction, our_value, their_value, king_value, bAI, iplayer):
+								return True
+						
+					# rook
+					if tpiece == 'R' or tpiece == 'S':
+						if target_pos == op_pos and (check_direction == us_against_piece):
+							# no points for taking a piece we've already taken
+							pass
+						elif end_pos == op_pos and (check_direction == them_against_king or check_direction == them_against_piece):
+							pass
+						elif op_pos.col == target_pos.col or op_pos.row == target_pos.row: # can't both be equal anyway
+							if op_pos == target_pos:
+								continue
+							# direction is OK, at least. Now check what's in the way...
+							distance = max( abs(op_pos.col - target_pos.col), abs(op_pos.row - target_pos.row))
+							if  pm.check_path(op_pos, target_pos, distance, False, True, iplayer, False) : # returns True if the target can be captured
+								if not s.common_scoring(b_in_check, hiscore, check_direction, our_value, their_value, king_value, bAI, iplayer):
+									return True
+							
+						# not assuming check:
+						if check_direction == us_against_king:
+							trace("o_p=" + str(op_pos) + " t_p=" + str(target_pos))
+							if  (abs((op_pos.col - target_pos.col)) == 2 and \
+								abs((op_pos.row - target_pos.row)) == 1) or \
+								(abs((op_pos.col - target_pos.col)) == 2 and \
+								abs((op_pos.row - target_pos.row)) == 1):
+								hiscore += 2 # small incentive for a move close enough to cut the king's moves, even if it's not check
+								trace("bonus for getting rook near to king")
+					
+					# bishop
+					if tpiece == 'B':
+						if target_pos == op_pos and (check_direction == us_against_piece):
+							# no points for taking a piece we've already taken
+							pass
+						elif end_pos == op_pos and (check_direction == them_against_king or check_direction == them_against_piece):
+							pass
+						else:	
+							if  abs(op_pos.col - target_pos.col) == abs(op_pos.row - target_pos.row) : # horizontal distance = vertical
+								# direction is OK, at least. Now check what's in the way...
+								distance = abs(op_pos.col - target_pos.col)
+								if  pm.check_path(op_pos, target_pos, distance, False, True, iplayer, False) :
+									if not s.common_scoring(b_in_check, hiscore, check_direction, our_value, their_value, king_value, bAI, iplayer):
+										return True
+									
+						# not assuming check:
+						if check_direction == us_against_king:
+							if  abs(op_pos.col - target_pos.col) == 2 and \
+								 abs(op_pos.row - target_pos.row) == 2 :
+								hiscore += 3 # incentive for a move close enough to cut the king's moves
+							
+					# queen or king
+					if tpiece == 'K' or tpiece == 'L' or tpiece == 'Q':
+						if target_pos == op_pos and (check_direction == us_against_piece):
+							# no points for taking a piece we've already taken
+							pass
+						elif end_pos == op_pos and (check_direction == them_against_king or check_direction == them_against_piece):
+							pass
+						else:
+							if  abs(op_pos.col - target_pos.col) == abs(op_pos.row - target_pos.row) or \
+								(op_pos.col == target_pos.col or op_pos.row == target_pos.row) :
+								# direction is OK, at least. Now check what's in the way...
+								if op_pos == target_pos:
+									# something's wrong then - how can they match?
+									trace("\tERROR: op_pos == target_pos : " + str(op_pos))
+									continue
+								distance = max(  abs(op_pos.col - target_pos.col) ,	\
+									max(abs(op_pos.col - target_pos.col), abs(op_pos.row - target_pos.row)) )	# if h/v
+								if distance == 1 or tpiece == 'Q': # Kings can only move one space
+									if  pm.check_path(op_pos, target_pos, distance, False, True, iplayer, False) :
+										if not s.common_scoring(b_in_check, hiscore, check_direction, our_value, their_value, king_value, bAI, iplayer):
+											return True
+									
+						# not assuming check:
+						if check_direction == us_against_king:
+							if  abs(op_pos.col - target_pos.col) == 2 or \
+								abs(op_pos.row - target_pos.row) == 2 :
+								hiscore += 2 # incentive for a move close enough to cut the king's moves
+			
+				if bAI == True:
+					if check_direction == them_against_king:
+						check_direction = them_against_current
+						trace("entered them_against_current state, player = " + str(iplayer))
+					elif check_direction == them_against_current:
+						check_direction = them_against_piece
+						trace("entered them_against_piece state, player = " + str(iplayer))
+					elif check_direction == them_against_piece:
+						iplayer = 1-iplayer
+						check_direction = us_against_king
+						trace("entered us_against_king state, player = " + str(iplayer))
+					elif check_direction == us_against_king:
+						iplayer = 1-iplayer
+						check_direction = us_against_piece
+						trace("entered us_against_piece state, player = " + str(iplayer))
+					elif check_direction == us_against_piece:
+						check_direction = no_more
+				else:
+					check_direction = no_more
+			
+			# penalise the move if we moved the same piece in the previous turn
+			if bAI:
+				if s.players[iplayer].pieces[s.players[iplayer].last_piece_moved] == pm.cboard.grid[start_pos.row][start_pos.col]:
+					hiscore -=3
+					if pm.cboard.grid[start_pos.row][start_pos.col] == 'Q' and s.get_num_pieces(1-iplayer) < 4:
+						# penalise the move if we moved the same queen in the previous turn (in addition to the general penalty below)
+						# this will give other pieces the chance to move in for the kill in the end game
+						hiscore -= 5
+				
+			finalhiscore = hiscore
+			trace("finalhiscore = " + str(finalhiscore))
+			hisc[0] = finalhiscore
+			if not bAI:
+				return False
+			else:
+				return b_in_check
+		except:
+			print("in_check : Unexpected exception: ",sys.exc_info()[:2])
+			
+	def in_check_mate(s, iplayer, b_move):
+		try:
+			# player here represents the next player, after the last move. We want to know if our player has any possible move.
+			# loop through every piece.
+			our_dir = 1 - iplayer * 2
+			index = 0
+			hiscore = 0
+			movescore = 1000
+
+			# to evaluate in random order...
+			
+			from random import shuffle
+			#my_indexes = [y for y in range(len(s.players[iplayer].positions))]
+			#shuffle(my_indexes)
+			my_indexes = [8,3,12,13,9,11,2,6,5,7,0,1,15,4,10,14]
+			# use a fixed array like above if we want to test this version against the C++ version
+		
+			op_king_pos = position(s.players[1-iplayer].positions[0])
+			num_our_pieces = s.get_num_pieces(iplayer)
+			num_their_pieces = s.get_num_pieces(1-iplayer)
+
+			for ind in range (len(s.players[iplayer].positions)):
+				# translate from index array - this should make it consider moves from all the same pieces, in a random order
+				i = my_indexes[ind]
+			
+				our_pos = s.players[iplayer].positions[i]
+				if not our_pos.is_valid():
+					continue # this piece was taken already
+				end_pos = position()
+			
+				# pawns
+				# diagonal move creates check
+				p = s.players[iplayer].pieces[i]
+				if p == 'P' or p == 'E':
+					trace("\ta pawn")
+					# one forward
+					end_pos.row = our_pos.row + our_dir
+					end_pos.col = our_pos.col
+					if  (not s.is_ours(end_pos, iplayer)) and (not s.is_ours(end_pos, 1-iplayer)) :
+						movescore = [1]
+						movescore[0] = 1002
+						if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
+							# this would get us out of check - we can leave now
+							if b_move:
+								if (our_pos.col > 0 and our_pos.col < 7):
+									if s.cboard.grid[iplayer * 7][our_pos.col - 1] == 'B' or s.cboard.grid[iplayer * 7][our_pos.col + 1] == 'B':
+										# frees a bishop
+										movescore[0] += 2
+								if to_endline(our_pos,end_pos, 1, iplayer):
+									movescore[0] += 4
+								if hiscore < movescore[0]:
+									hiscore = movescore[0]
+									s_move = s.create_move(our_pos, end_pos)
 							else:
+								return False
+					# two forward
+					if (our_pos.row == 1 and our_dir == 1) or (our_pos.row == 7 and our_dir == -1):
+						end_pos.row = int(our_pos.row + our_dir * 2)
+						end_pos.col = int(our_pos.col)
+						if not s.is_ours(end_pos, iplayer):
+							if s.cboard.grid[end_pos.row][end_pos.col] == '.' and s.cboard.grid[int((our_pos.row + end_pos.row)/2)][int(our_pos.col)] == '.':
+								movescore = [1]
+								movescore[0] = 1003
+								if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
+									if b_move:
+										if our_pos.col > 0 and our_pos.col < 7:
+											if s.cboard.grid[iplayer * 7][our_pos.col - 1] == 'B' or s.cboard.grid[iplayer * 7][our_pos.col + 1] == 'B':
+												# frees a bishop
+												movescore[0] += 2
+										if hiscore < movescore[0]:
+											hiscore = movescore[0]
+											s_move = s.create_move(our_pos, end_pos)
+									else:
+										return False
+					# diagonals, taking a piece
+					# try left, then right:
+					for ep_dir in range(-1,2,2):
+						if (our_pos.col + ep_dir) in range(8):
+							end_pos.row = our_pos.row + our_dir
+							end_pos.col = our_pos.col + ep_dir
+							ep_pos = position(our_pos.row, end_pos.col)
+							if  s.is_ours(end_pos, 1-iplayer) and not(s.is_ours(ep_pos, 1-iplayer) and s.cboard.grid[our_pos.row][end_pos.col] == 'E') :
+								# if we call is_ours with the other player, it's effectively an "is_theirs" function
+								# this comparison also makes sure we don't steal the en passant case below
+								movescore = [1]
+								movescore[0] = 1002
+								if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
+									if b_move:
+										if to_endline(our_pos,end_pos, 1, iplayer):
+											movescore[0] += 4
+										if hiscore < movescore[0]:
+											hiscore = movescore[0]
+											s_move = s.create_move(our_pos, end_pos)
+									else:
+										return False
+								else:
+									pass
+					# en passant - possibly still taking a piece
+					# diagonals, taking a piece
+					# try left, then right:
+					for ep_dir in range(-1,2,2):
+						if (our_pos.col + ep_dir) in range(8):
+							end_pos.row = our_pos.row + our_dir
+							end_pos.col = our_pos.col + ep_dir
+							ep_pos = position(our_pos.row, end_pos.col)
+							if ep_pos.is_valid() and not s.is_ours(end_pos, iplayer):
+								# here it gets difficult. It isn't enough to pass in the normal diagonal move,
+								# because the pawn we take en passant may also affect check. So we will
+								# create a temporary modified board for this single circumstance and 
+								# pass a reference to it to check in, AND the diagonal move.
+								if s.is_ours(ep_pos, 1-iplayer) and s.cboard.grid[our_pos.row][end_pos.col] == 'E':
+									gm = gameobject(s) # proposed move
+									# now replace the captured en passant pawn
+									gm.cboard.grid[our_pos.row][end_pos.col] = '.'
+									for index in range(len(gm.players[1-iplayer].positions)):
+										if gm.players[1-iplayer].positions[index] == ep_pos:
+											gm.players[1-iplayer].positions[index] = position()
+
+									# if it turns out the position we move the pawn into also contains an opposing piece, this will be handled explicity in in_check.
+									movescore = [1]
+									movescore[0] = 1004
+									if not s.in_check(iplayer, movescore, our_pos, end_pos, gm): 
+										if b_move:
+											if hiscore < movescore[0]:
+												hiscore = movescore[0]
+												s_move = s.create_move(our_pos, end_pos)
+										else:
+											return False
+					# finally, promotion doesn't matter for determining check-mate, as a piece of any type can't move until the next go anyway
+				elif p == 'N':
+					trace("\ta knight")
+					# knight
+					# the eight combinations:
+					for y in range(-2,3,1):
+						for x in range(-2,3,1):
+							if x == 0 or y == 0:
+								continue
+							end_pos.row = our_pos.row
+							end_pos.col = our_pos.col
+							if abs(x) != abs(y):
+								end_pos.row = end_pos.row + y
+								end_pos.col = end_pos.col + x
+								if not end_pos.is_valid():
+									continue # out of bounds try next combo
+								if not s.is_ours(end_pos, iplayer):
+									movescore = [1]
+									movescore[0] = 1001
+									if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
+										if b_move:
+											pmv = pastmove(our_pos, end_pos)					
+											if s.players[iplayer].piecemoves[i].pastmove_set[tuple(pmv)] > 0:
+												pm2 = tuple(pmv)
+											for l in s.players[iplayer].piecemoves[i].pastmove_set.elements():
+												s1, s2, s3, s4 = l# s.players[iplayer].piecemoves[i].pastmove_set[l]
+												if our_pos.row == s1 and our_pos.col == s2 and end_pos.row == s3 and end_pos.col == s4:
+													movescore[0] -= s.players[iplayer].piecemoves[i].pastmove_set[l] * 3 # i.e. penalise repeat moves
+													break
+											if off_backline(our_pos,end_pos, 2, iplayer):
+												movescore[0] += 2
+											if hiscore < movescore[0]:
+												hiscore = movescore[0]
+												s_move = s.create_move(our_pos, end_pos)
+										else:
+											return False
+				elif p == 'R' or p == 'S':
+					trace("\ta rook")
+					dx = 0
+					dy = 0
+					for dir in range(4):
+						if dir == 0:
+							dx = -1
+							dy = 0
+						elif dir == 1:
+							dx = 1
+							dy = 0
+						elif dir == 2:
+							dx = 0
+							dy = -1
+						elif dir == 3:
+							dy = 0
+							dy = 1
+						#end_pos = our_pos # this isn't working#
+						end_pos = position(our_pos.row, our_pos.col)
+						offset = 1
+						b_cont = True
+						while b_cont:
+							end_pos.row = end_pos.row + dy
+							end_pos.col = end_pos.col + dx
+							# in bounds?
+							if not end_pos.is_valid():
 								b_cont = False
-							# The move is good
-						if s.players[iplayer].pieces[i] == 'K' or s.players[iplayer].pieces[i] == 'L':
-							b_cont = False # Kings can only move one space
-		if hiscore > 0 and b_move:
-			s.move_piece(s_move, iplayer, True) # computer makes a move for us
-			if not GUI:
-				print(s_move)
+							else:
+								if not s.is_ours(end_pos, iplayer): # possible
+									movescore = [1]
+									movescore[0] = 1001
+									if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
+										if b_move:
+											pmv = pastmove(our_pos, end_pos)					
+											if s.players[iplayer].piecemoves[i].pastmove_set[tuple(pmv)] > 0:
+												pm2 = tuple(pmv)
+											for l in s.players[iplayer].piecemoves[i].pastmove_set.elements():
+												s1, s2, s3, s4 = l# s.players[iplayer].piecemoves[i].pastmove_set[l]
+												if our_pos.row == s1 and our_pos.col == s2 and end_pos.row == s3 and end_pos.col == s4:
+													movescore[0] -= s.players[iplayer].piecemoves[i].pastmove_set[l] * 3 # i.e. penalise repeat moves
+													break
+											if hiscore < movescore[0]:
+												hiscore = movescore[0]
+												s_move = s.create_move(our_pos, end_pos)
+										else:
+											return False
+									if s.is_ours(end_pos, 1-iplayer): # theirs - we can't go on then
+										b_cont = False
+								else:
+									b_cont = False
+				elif p == 'B':
+					trace("\ta bishop")
+					# bishop
+					dx = -1
+					dy = -1
+					for dir in range(4):
+						if dir == 0: # SE
+							dx = dy = 1
+						elif dir == 1: # NE
+							dx = 1
+							dy = -1
+						elif dir == 2: # SW
+							dx = -1
+							dy = 1
+						elif dir == 3: # NW
+							dx = dy = -1
+
+						# this algorithm is IDENTICAL to the rook
+						end_pos = position(our_pos.row, our_pos.col)
+						offset = 1
+						b_cont = True
+						while b_cont:
+							end_pos.row = end_pos.row + dy
+							end_pos.col = end_pos.col + dx
+							# in bounds?
+							if not end_pos.is_valid():
+								b_cont = False
+							else:
+								if not s.is_ours(end_pos, iplayer): # possible
+									movescore = [1]
+									movescore[0] = 1001
+									if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
+										if b_move:
+											pmv = pastmove(our_pos, end_pos)					
+											if s.players[iplayer].piecemoves[i].pastmove_set[tuple(pmv)] > 0:
+												pm2 = tuple(pmv)
+											for l in s.players[iplayer].piecemoves[i].pastmove_set.elements():
+												s1, s2, s3, s4 = l
+												if our_pos.row == s1 and our_pos.col == s2 and end_pos.row == s3 and end_pos.col == s4:
+													movescore[0] -= s.players[iplayer].piecemoves[i].pastmove_set[l] * 3 # i.e. penalise repeat moves
+													break
+											if off_backline(our_pos,end_pos, 2, iplayer):
+												movescore[0] += 2
+											if hiscore < movescore[0]:
+												hiscore = movescore[0]
+												s_move = s.create_move(our_pos, end_pos)
+										else:
+											return False
+									if s.is_ours(end_pos, 1-iplayer): # theirs - we can't go on then
+										b_cont = False
+								else:
+									b_cont = False
+				if p == 'K' or p == 'L' or p == 'Q':
+					trace("\ta king or queen")
+					# queen or king
+					dx = dy = 0
+					for dir in range(8):
+						if dir == 0: # N
+							dx = 0
+							dy = -1
+						elif dir == 1: # NE
+							dx = 1
+							dy = -1
+						elif dir == 2: # E
+							dx = 1
+							dy = 0
+						elif dir == 3: # SE
+							dx = dy = 1
+						elif dir == 4: # S
+							dx = 0
+							dy = 1
+						elif dir == 5: # SW
+							dx = -1
+							dy = 1
+						elif dir == 6: # W
+							dx = -1
+							dy = 0
+						elif dir == 7: # NW
+							dx = dy = -1
+
+						# this algorithm is ALMOST IDENTICAL to the rook and bishop
+						end_pos = position(our_pos.row, our_pos.col)
+						b_cont = True
+						while b_cont:
+							end_pos.row = end_pos.row + dy
+							end_pos.col = end_pos.col + dx
+							# in bounds?
+							if not end_pos.is_valid():
+								b_cont = False
+							else:
+								if not s.is_ours(end_pos, iplayer): # possible
+									movescore = [1]
+									movescore[0] = 1001
+									if not s.in_check(iplayer, movescore, our_pos, end_pos, None):
+										if b_move:
+											pmv = pastmove(our_pos, end_pos)					
+											if s.players[iplayer].piecemoves[i].pastmove_set[tuple(pmv)] > 0:
+												pm2 = tuple(pmv)
+											for l in s.players[iplayer].piecemoves[i].pastmove_set.elements():
+												s1, s2, s3, s4 = l
+												if our_pos.row == s1 and our_pos.col == s2 and end_pos.row == s3 and end_pos.col == s4:
+													movescore[0] -= s.players[iplayer].piecemoves[i].pastmove_set[l] * 3 # i.e. penalise repeat moves
+													break
+											if (num_our_pieces < num_their_pieces) and (num_our_pieces < 5) and (our_pos.row != (iplayer*7)) and (end_pos.row == (iplayer * 7)):
+												movescore[0] -= 2 # subtle hint not to move king into the far home corner in the later stages when under pressure
+											if hiscore < movescore[0]:
+												hiscore = movescore[0]
+												s_move = s.create_move(our_pos, end_pos)
+										else:
+											return False
+									if s.is_ours(end_pos, 1-iplayer): # theirs - we can't go on then
+										b_cont = False
+								else:
+									b_cont = False
+							if s.players[iplayer].pieces[i] == 'L' and dy == 0 and abs(end_pos.col - our_pos.col) == 2:
+								# castling - taken from validate_move
+
+								# Castling is permissible if and only if all of the following conditions hold:
+								# 1. The king and the chosen rook are on the player's first rank.
+								# 2. Neither the king nor the chosen rook have previously moved.
+								#    (Use L for an unmoved king, and S for an unmoved rook)
+								
+								rook_pos = position()
+								if s.cboard.grid[iplayer*7][0] == 'S' and s.cboard.grid[iplayer*7][4] == 'L' and our_pos.col == 4 and end_pos.col == 2:
+									rook_pos.col = 0
+								elif s.cboard.grid[iplayer*7][7] == 'S' and s.cboard.grid[iplayer*7][4] == 'L' and our_pos.col == 4 and end_pos.col == 6:
+									rook_pos.col = 7
+								else:
+									b_cont = False # one or both of the king and the rook have moved from their starting position (even if they've since returned
+								rook_pos.row = iplayer*7
+
+								theirpiece = s.is_ours(end_pos,1-iplayer) - 1 # technically this requires an actual index but for the moment, -1 means not theirs
+								b_dest_empty = (not s.is_ours(end_pos,1-iplayer)) and (not s.is_ours(end_pos,iplayer))
+							
+								# 3. There are no pieces between the king and the chosen rook (NOT merely where the king moves to.)			
+								if not s.check_path(our_pos, rook_pos, abs(end_pos.col - our_pos.col), b_dest_empty, theirpiece, iplayer,False):
+									b_cont = False
+					
+								# 4. The king is not currently in check.
+								movescore = [1]
+								movescore[0] = 0
+								if s.in_check(iplayer, movescore, position(), position(), None):
+									b_cont = False
+
+								# 5. The king does not pass through a square that is attacked by an enemy piece.
+								#    - Oh bloody hell. Modify check_path to call in_check for every square it passes through...
+								if not s.check_path(our_pos, end_pos, abs(end_pos.col - our_pos.col), b_dest_empty, theirpiece, iplayer, True):
+									b_cont = False
+
+								# 6. The king does not end up in check. (True of any legal move.)
+								# Rook manouevre is already proven as valid
+								movescore = [1]
+								movescore[0] = 1003
+								if not s.in_check(iplayer, movescore, our_pos, end_pos, None): #new king pos, NOT the rook pos...
+									if b_move:
+										pmv = pastmove(our_pos, end_pos)
+										movescore[0] -= s.players[iplayer].piecemoves[i].pastmove_set[tuple(pmv)] * 3 # i.e. penalise repeat moves
+										if hiscore < movescore[0]:
+											hiscore = movescore[0]
+											s_move = s.create_move(our_pos, end_pos)
+									else:
+										return False
+								else:
+									b_cont = False
+								# The move is good
+							if s.players[iplayer].pieces[i] == 'K' or s.players[iplayer].pieces[i] == 'L':
+								b_cont = False # Kings can only move one space
+			if hiscore > 0 and b_move:
+				s.move_piece(s_move, iplayer, True) # computer makes a move for us
+				if not GUI: print(s_move)
+		except:
+			print("in_check_mate : Unexpected exception: ",sys.exc_info()[:2])
 		return True
 	
 	def is_ours(s, pos, iplayer):
@@ -1958,7 +1916,7 @@ class gameobject(object):
 			
 	def print_board(s):
 		try:
-			if GUI:
+			if GUI and not debug:
 				return
 			bchar = u"\u2591" # light shaded block
 			print("_"*65)
@@ -1981,10 +1939,10 @@ class gameobject(object):
 						p = 'K'
 					elif p == 'S':
 						p = 'R'
-					for each in s.players[1].positions:
+					for each in s.players[0].positions:
 						if each == pos:
 							cdir = '^' # up (player 2)
-							# convert player 2 to lower case:
+							# convert player 1 to lower case:
 							p = p.lower()
 							break
 					if p == '.':
@@ -2103,139 +2061,145 @@ class gameobject(object):
 			bRet = False
 		return bRet
 
-# This is the equivalent of main():
+gm = gameobject() # TO DO: where do we do this?
+		
+def main():
+	if not GUI:	
+		print("Chess")
+		print("=" * 5)
 
-if not GUI:	
-	print("Chess")
-	print("=" * 5)
-
-try:
-	gm = gameobject()
-	if gm.new_game():
-	# this loop is for the console - 
-		while True:
-			score = [1]
-			score[0] = 0
-			# signals we're not valuing a move for AI (1000+ if so)
-			print (gm.players[gm.cplayer].name + "'s turn:")
-			
-			if gm.turn > 50:
-				print("\nThe game is A DRAW - 50 moves have been made without victory.")
-				gm.b_game_over = True
-				gm.players[0].b_computer = False
-				gm.players[1].b_computer = False
+	try:
+		if gm.new_game():
+		# this loop is for the console - 
+			while True:
+				score = [1]
+				score[0] = 0
+				# signals we're not valuing a move for AI (1000+ if so)
+				print (gm.players[gm.cplayer].name + "'s turn:")
 				
-			if GUI:
-				top.mainloop()	
-				# won't return until we've made a move
-				
-			if gm.players[gm.cplayer].b_computer:
-				cmd = "play"
-			else:
-				cmd = user_input()
-
-			# All these calls are covered by their own exception handling. If they fail, they
-			# don't necessarily prevent other options from working, so we don't quit the program.
-			if cmd == "exit": break
-			if cmd == "new":
-				gm.turn = 1
-				gm.cplayer = 1
-				gm.new_game()
-				gm.game_over = False
-			elif cmd == "save":
-				gm.save_game()
-			elif cmd == "open":
-				if gm.load_game():
-					gm.b_game_over = False
-				else:
-					print("\nNo saved game was found.\n")
-			elif cmd == "all":
-				gm.print_all_variables()
-			elif cmd == "board":
-				gm.print_board()
-			elif cmd == "pastmoves":
-				gm.print_pastmoves()
-			elif cmd == "stats":
-				gm.show_stats()
-			elif cmd == "pieces":
-				gm.print_pieces()
-			elif cmd == "help":
-				gm.show_help()
-			elif cmd == "checkcheck": # for debug only
-				if gm.in_check(gm.cplayer, score, position(), position(), None ):
-					print("\nCHECK\n") 
-				else:
-					print("\nNo check\n")
-			elif cmd == "computer":
-				if not gm.players[gm.cplayer].b_computer:
-					gm.players[gm.cplayer].b_computer = True
-					print("\nThe computer now has control of this player.\n")
-				else:
-					print("\nThe computer already has control of this player.\n")
-			elif cmd == "me":
-				if gm.players[1-gm.cplayer].b_computer == True:
-					gm.players[gm.cplayer].b_computer = False
-					print ("\nYou now have control of the other player.\n")
-				else:
-					print ("\nYou already have control of the other player.\n")	
-			elif cmd == "play":
-				gm.computer_turn(gm.cplayer)# finds a move and makes it
-				gm.cplayer = not gm.cplayer
-				if gm.in_check(gm.cplayer, score, position(), position(), None):
-					print("\nCHECK")
-				if gm.in_check_mate(gm.cplayer, False):
-					print("CHECK MATE")
-					print(gm.players[1-gm.cplayer].name + " wins")
+				if gm.turn > 50:
+					print("\nThe game is A DRAW - 50 moves have been made without victory.")
 					gm.b_game_over = True
 					gm.players[0].b_computer = False
 					gm.players[1].b_computer = False
-				elif gm.is_stalemate():
-					print("\nThe game is A DRAW - the same move has been made three times now.")
-					gm.b_game_over = True
-					gm.players[0].b_computer = False
-					gm.players[1].b_computer = False
-				elif gm.cplayer == 1:
-					gm.turn += 1
-			elif not gm.b_game_over:
-				# maybe this is an actual move then!
-				if gm.validate_move(cmd, gm.cplayer):
-					print(cmd)
-					gm.move_piece(cmd, gm.cplayer)
-					gm.cplayer = 1 - gm.cplayer
+					
+				if GUI:
+					top.mainloop()	
+					# won't return until we've made a move
+					
+				if gm.players[gm.cplayer].b_computer:
+					cmd = "play"
+				else:
+					cmd = user_input()
+
+				# All these calls are covered by their own exception handling. If they fail, they
+				# don't necessarily prevent other options from working, so we don't quit the program.
+				if cmd == "exit": break
+				if cmd == "new":
+					gm.turn = 1
+					gm.cplayer = 1
+					gm.new_game()
+					gm.game_over = False
+				elif cmd == "save":
+					gm.save_game()
+				elif cmd == "open":
+					if gm.load_game():
+						gm.b_game_over = False
+					else:
+						print("\nNo saved game was found.\n")
+				elif cmd == "all":
+					gm.print_all_variables()
+				elif cmd == "board":
+					gm.print_board()
+				elif cmd == "pastmoves":
+					gm.print_pastmoves()
+				elif cmd == "stats":
+					gm.show_stats()
+				elif cmd == "pieces":
+					gm.print_pieces()
+				elif cmd == "help":
+					gm.show_help()
+				elif cmd == "checkcheck": # for debug only
+					if gm.in_check(gm.cplayer, score, position(), position(), None ):
+						print("\nCHECK\n") 
+					else:
+						print("\nNo check\n")
+				elif cmd == "computer":
+					if not gm.players[gm.cplayer].b_computer:
+						gm.players[gm.cplayer].b_computer = True
+						print("\nThe computer now has control of this player.\n")
+					else:
+						print("\nThe computer already has control of this player.\n")
+				elif cmd == "me":
+					if gm.players[1-gm.cplayer].b_computer == True:
+						gm.players[gm.cplayer].b_computer = False
+						print ("\nYou now have control of the other player.\n")
+					else:
+						print ("\nYou already have control of the other player.\n")	
+				elif cmd == "play":
+					gm.computer_turn(gm.cplayer)# finds a move and makes it
+					gm.cplayer = not gm.cplayer
 					if gm.in_check(gm.cplayer, score, position(), position(), None):
-						print("CHECK")
+						print("\nCHECK")
 					if gm.in_check_mate(gm.cplayer, False):
-						print ("\nCHECK MATE")
+						print("CHECK MATE")
 						print(gm.players[1-gm.cplayer].name + " wins")
 						gm.b_game_over = True
 						gm.players[0].b_computer = False
 						gm.players[1].b_computer = False
 					elif gm.is_stalemate():
-						print ("\nThe game is A DRAW - the same move has been made three times now.")
+						print("\nThe game is A DRAW - the same move has been made three times now.")
 						gm.b_game_over = True
 						gm.players[0].b_computer = False
 						gm.players[1].b_computer = False
 					elif gm.cplayer == 1:
 						gm.turn += 1
-	else:
-		pass
-		# GUI exit
-		
-except SystemExit as e:
-	# This will happen when the GUI exits
-	sys.exit(e)
-except:
-	print("Unexpected exception: ", sys.exc_info()[:2])
-	print("The program will now close.")
-	pause()
-	exc = "Chess program failed due to the following exception: " + str(sys.exc_info()[:2])
-	sys.exit(exc)
+				elif not gm.b_game_over:
+					# maybe this is an actual move then!
+					if gm.validate_move(cmd, gm.cplayer):
+						print(cmd)
+						gm.move_piece(cmd, gm.cplayer)
+						gm.cplayer = 1 - gm.cplayer
+						if gm.in_check(gm.cplayer, score, position(), position(), None):
+							print("CHECK")
+						if gm.in_check_mate(gm.cplayer, False):
+							print ("\nCHECK MATE")
+							print(gm.players[1-gm.cplayer].name + " wins")
+							gm.b_game_over = True
+							gm.players[0].b_computer = False
+							gm.players[1].b_computer = False
+						elif gm.is_stalemate():
+							print ("\nThe game is A DRAW - the same move has been made three times now.")
+							gm.b_game_over = True
+							gm.players[0].b_computer = False
+							gm.players[1].b_computer = False
+						elif gm.cplayer == 1:
+							gm.turn += 1
+		else:
+			pass
+			# GUI exit
+			
+	except SystemExit as e:
+		# This will happen when the GUI exits
+		sys.exit(e)
+	except:
+		print("Unexpected exception: ", sys.exc_info()[:2])
+		print("The program will now close.")
+		pause()
+		exc = "Chess program failed due to the following exception: " + str(sys.exc_info()[:2])
+		sys.exit(exc)
 
+if __name__ == '__main__':
+    main()
 	
-# TO DO: change so that white = caps, black = lower case
+# added : main function
+# TO DO: check_mate check has stopped working - fix
+# TO DO: change our notation in console form? - at very least, lose hyphen
+
 # TO DO: a regression test
 # TO DO: a common algorithm for rook/bishop/queen/king
-# TO DO: add main
+# TO DO: changes to calculation of moves - have a find_best_move function (clearer than in_check), and use a recursive
+#        algorithm instead of iterating between this user and the next, as that also allows us to calculate more moves.
 	
 # TO DO: in_check_mate may duplicate much of in_check - might be opportunities to make it a function
 # TO DO: remove globals, and structure as OO

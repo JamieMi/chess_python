@@ -434,6 +434,40 @@ class ChessMainWnd(tkinter.Frame):
 debug = False
 GUI = True
 
+
+def build_helpstring()	:
+	hs = ""
+	if not GUI:
+		hs += "\n"
+	hs += "Chess\n\n"
+	hs += "Written by Jamie Mitchinson\n"
+	
+	if not GUI:
+		hs += "\n----\n"
+		hs += "All moves can be expressed in form a1-b2, where the first pair is the source\n"
+		hs += "position and the second pair represents the destination. Note that the castling\n"
+		hs += "move can be attempted by moving the king two spaces - e.g. a kingside castling\n"
+		hs += "could be attempted by e1-g1 or e8-g8. The move of the rook is then implicit.\n\n"
+	else:
+		hs += "\n"
+	if GUI:
+		hs += "Menu commands are:\n\n"
+		hs += "computer control - computer takes over as this player.\n"
+		hs += "player control - user takes control over the OTHER player.\n"
+		hs += "play computer move - let the computer play the move.\n\n"
+	else:
+		hs += "Commands are:\n\n"
+		hs += "computer - computer takes over as this player.\n"
+		hs += "me - user takes control over the other player.\n"
+		hs += "play - let the computer play the move.\n\n"
+	
+	hs += "open\t- loads a saved game. Only one saved position is allowed.\n"
+	hs += "save\t- Saves a game. This will save over any previous saved game.\n"
+	hs += "new\t- New game.\n"
+	hs += "exit\t- Exit the program.\n"
+	hs += "stats\t- Shows game statistics.\n\n"
+	return hs
+
 def trace(s):
 	if debug:
 		print(s)
@@ -884,39 +918,6 @@ class gameobject(object):
 					return not s.in_check(iplayer, dummyscore, start_pos, end_pos, None) # end_pos is the new king pos, NOT the rook pos...
 					# Note : I believe the rook manoeuvre will always be valid now, because if the king's path is clear, so must be the rook's.
 			return False
-		
-	def build_helpstring(s)	:
-		hs = ""
-		if not GUI:
-			hs += "\n"
-		hs += "Chess\n\n"
-		hs += "Written by Jamie Mitchinson\n"
-		
-		if not GUI:
-			hs += "\n----\n"
-			hs += "All moves can be expressed in form a1-b2, where the first pair is the source\n"
-			hs += "position and the second pair represents the destination. Note that the castling\n"
-			hs += "move can be attempted by moving the king two spaces - e.g. a kingside castling\n"
-			hs += "could be attempted by e1-g1 or e8-g8. The move of the rook is then implicit.\n\n"
-		else:
-			hs += "\n"
-		if GUI:
-			hs += "Menu commands are:\n\n"
-			hs += "computer control - computer takes over as this player.\n"
-			hs += "player control - user takes control over the OTHER player.\n"
-			hs += "play computer move - let the computer play the move.\n\n"
-		else:
-			hs += "Commands are:\n\n"
-			hs += "computer - computer takes over as this player.\n"
-			hs += "me - user takes control over the other player.\n"
-			hs += "play - let the computer play the move.\n\n"
-		
-		hs += "open\t- loads a saved game. Only one saved position is allowed.\n"
-		hs += "save\t- Saves a game. This will save over any previous saved game.\n"
-		hs += "new\t- New game.\n"
-		hs += "exit\t- Exit the program.\n"
-		hs += "stats\t- Shows game statistics.\n\n"
-		return hs
 	
 	def show_help(s):
 		helptext = build_helpstring() # this allows the GUI to use the same formatted text
@@ -1046,8 +1047,8 @@ class gameobject(object):
 				# and there is any adjacent opposing piece...
 				for each_pos in s.players[1-iplayer].positions:
 					if  (each_pos.row == end_pos.row) and abs(each_pos.col - end_pos.col) == 1 :
-							  s.cboard.grid[end_pos.row][end_pos.col] = 'E'    #signifies en passant will be restored at the start of the next turn
-							  s.players[iplayer].pieces[ourindex] = 'E'			# ditto - allows the state to be saved
+						s.cboard.grid[end_pos.row][end_pos.col] = 'E'    #signifies en passant will be restored at the start of the next turn
+						s.players[iplayer].pieces[ourindex] = 'E'		# ditto - allows the state to be saved
 		
 		# Can a pawn be promoted?
 		if  piece == 'P' and ((iplayer == 0 and end_pos.row == (BOARD_RANKS-1)) or (iplayer == 1 and end_pos.row == 0)) :
@@ -1199,7 +1200,7 @@ class gameobject(object):
 				our_value = s.get_capture_value(pm.cboard.grid[start_pos.row][start_pos.col])
 				their_value = s.get_capture_value(pm.cboard.grid[end_pos.row][end_pos.col])
 								
-				hiscore += their_value * 2 #pieces taken immediately have to be more valuable than those could be taken in the net turn...
+				hiscore += their_value * 2 #pieces taken immediately have to be more valuable than those could be taken in the next turn...
 				# add the proposed move to the copy of the board
 				
 				pm.cboard.grid[end_pos.row][end_pos.col] = pm.cboard.grid[start_pos.row][start_pos.col]
@@ -1290,7 +1291,7 @@ class gameobject(object):
 							if  (tpiece == 'E') and \
 								(op_pos.row == target_pos.row) and \
 								abs(op_pos.col - target_pos.col) == 1 :
-								if not s.common_scoring(s, b_in_check, hiscore, check_direction, our_value, their_value, king_value, bAI, iplayer):
+								if not s.common_scoring(b_in_check, hiscore, check_direction, our_value, their_value, king_value, bAI, iplayer):
 									return True
 						
 					# knight
@@ -2073,7 +2074,7 @@ def main():
 	except:
 		print("Unexpected exception: ", sys.exc_info()[:2])
 		print("The program will now close.")
-		pause()
+		
 		exc = "Chess program failed due to the following exception: " + str(sys.exc_info()[:2])
 		sys.exit(exc)
 
